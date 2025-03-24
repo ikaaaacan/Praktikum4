@@ -1,46 +1,33 @@
 <?php
-// koneksi.php
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "db_kampus";
+// Koneksi ke database
+$servername = "localhost";
+$username = "root"; // Sesuaikan dengan user MySQL kamu
+$password = ""; // Kosongkan jika tidak ada password
+$dbname = "db_kampus";
 
-// Membuat koneksi ke database
-$conn = mysqli_connect($host, $user, $pass, $db);
+// Membuat koneksi
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Cek koneksi
-if (!$conn) {
-    die("Koneksi gagal: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 
 // Ambil data dari tabel mahasiswa
-$query = "SELECT * FROM mahasiswa";
-$result = mysqli_query($conn, $query);
+$sql = "SELECT * FROM mahasiswa";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Mahasiswa</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 50%;
-            margin: 20px auto;
-        }
-        th, td {
-            border: 2.5px solid black;
-            padding: 20px;
-            text-align: center;
-        }
-        th {
-            background-color: #B8860B;
-        }
-    </style>
 </head>
 <body>
-    <h2 style="text-align: center;">Data Mahasiswa</h2>
-    <table>
+    <h2>Data Mahasiswa</h2>
+    <table border="1">
         <tr>
             <th>No</th>
             <th>NIM</th>
@@ -48,14 +35,24 @@ $result = mysqli_query($conn, $query);
         </tr>
         <?php
         $no = 1;
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr>";
-            echo "<td>" . $no++ . "</td>";
-            echo "<td>" . $row['NIM'] . "</td>";
-            echo "<td>" . $row['NAMA'] . "</td>";
-            echo "</tr>";
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr>
+                        <td>$no</td>
+                        <td>{$row['nim']}</td>
+                        <td>{$row['nama']}</td>
+                      </tr>";
+                $no++;
+            }
+        } else {
+            echo "<tr><td colspan='3'>Tidak ada data</td></tr>";
         }
         ?>
     </table>
 </body>
 </html>
+
+<?php
+// Tutup koneksi
+$conn->close();
+?>
